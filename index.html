@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SimpleHW converter</title>
+</head>
+<body>
+<section class="bitCel">
+    <h1>Convert Bits to Celsius and vice versa.</h1>
+    <p>
+        Enter Bits to calculate Celsius:
+        <input type="text" id="txt1" name="text1" placeholder="enter bits..">
+    </p>
+    <p>
+        <button onclick="bitsToCelsius()">Calculate</button>
+    </p>
+    <p>
+        Enter Celsius value to calculate bits:
+        <input type="text" id="txt2" name="text2" placeholder="enter Celsius..">
+    </p>
+    <p>
+        <button onclick="celsiusToBits()">Calculate</button>
+    </p>
+    <span id="message1"></span>
+</section>
+
+<section class="bitTime">
+    <h1>Convert time to bits and vice versa.</h1>
+    <p>
+        Enter Time to calculate bits:
+        <input type="text" id="txt3" name="text3" placeholder="enter time..">
+    </p>
+    <select name="time" id="time">
+        <option value="seconds">Seconds</option>
+        <option value="minutes">Minutes</option>
+        <option value="hours">Hours</option>
+        <option value="days">Days</option>
+    </select>
+    <p>
+        <button onclick="timeToBits()">Calculate</button>
+    </p>
+    <p>
+        Enter bits to calculate time:
+        <input type="text" id="txt4" name="text4" placeholder="enter bits..">
+    </p>
+    <p>
+        <button onclick="bitsToTime()">Calculate</button>
+    </p>
+    <span id="message2"></span>
+</section>
+<script>
+    function bitsToCelsius() {
+        const y = document.getElementById("txt1").value;
+        if(y === '') {
+            return
+        }
+        const condition = /^([1]|[0]){0,8}$/;
+        if(!y.toString().match(condition)) {
+            document.getElementById("message1").innerHTML = 'You can enter only bits and max value is 1 Byte.';
+        } else {
+            let decValue = parseInt((y + '').replace(/[^01]/gi, ''), 2);
+            let result = (decValue * 0.5) - 40;
+            document.getElementById("message1").innerHTML = 'Result of your conversion is ' + result + '° Celsius.';
+        }
+    }
+
+    function celsiusToBits() {
+        const y = document.getElementById("txt2").value;
+        if(y === '') {
+            return
+        }
+        if(y < -40 || y > 87.5) {
+            document.getElementById("message1").innerHTML = 'You can enter only temperature form -40 to 87.5° Celsius.';
+        } else {
+            let resultDec = (y * 2) + 80;
+            let result = (resultDec >>> 0).toString(2);
+            document.getElementById("message1").innerHTML = 'Result of your conversion is ' + result + ' bites.';
+        }
+    }
+
+    function timeToBits() {
+        const y = document.getElementById("txt3").value;
+        if(y === '') {
+            return
+        }
+        let bitArray = [];
+        if(y > 63) {
+            document.getElementById("message2").innerHTML = 'Max time value is 63.';
+        } else {
+            bitArray = ((y >>> 0).toString(2)).split('');
+            while(bitArray.length < 6) {
+                bitArray.unshift('0')
+            }
+            let x = document.getElementById("time").selectedIndex;
+            if(x === 0) {
+                bitArray.unshift('0','0');
+            }else if(x === 1) {
+                bitArray.unshift('0', '1')
+            }else if (x === 2) {
+                bitArray.unshift('1', '0')
+            }else if(x === 3)  {
+                bitArray.unshift('1', '1')
+            }
+            let str = bitArray.join('');
+            document.getElementById("message2").innerHTML = `Bits value is  ${str}.`;
+        }
+    }
+
+    function bitsToTime() {
+        let y = document.getElementById("txt4").value;
+        if(y === '') {
+            return
+        }
+        const condition = /^([1]|[0]){0,8}$/;
+        if(!y.toString().match(condition)) {
+            document.getElementById("message2").innerHTML = 'You can enter only bits and max value is 1 Byte.';
+        } else {
+            let str;
+            y = y.split('');
+            let timeBits = y.splice(2, 8);
+            let decValue = timeBits.join("");
+            decValue = parseInt((decValue + '').replace(/[^01]/gi, ''), 2);
+            if(y[0] === '0' && y[1] === '0') {
+               str =  `${decValue} seconds`;
+            } else if (y[0] === '0' && y[1] === '1') {
+                str = `${decValue} minutes`;
+            }else if (y[0] === '1' && y[1] === '0') {
+                str = `${decValue} hours`;
+            } else if (y[0] === '1' && y[1] === '1') {
+                str = `${decValue} days`
+            } else {
+                str = 'undefined'
+            }
+            document.getElementById("message2").innerHTML = `Time is  ${str}.`;
+        }
+    }
+</script>
+</body>
+</html>
